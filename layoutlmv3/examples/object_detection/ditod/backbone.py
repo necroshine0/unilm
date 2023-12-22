@@ -11,7 +11,8 @@
 # CoaT: https://github.com/mlpc-ucsd/CoaT
 # --------------------------------------------------------------------------------
 
-
+import os
+import sys
 import torch
 
 from detectron2.layers import (
@@ -22,7 +23,10 @@ from detectron2.modeling.backbone.fpn import LastLevelP6P7, LastLevelMaxPool
 
 from .beit import beit_base_patch16, dit_base_patch16, dit_large_patch16, beit_large_patch16
 from .deit import deit_base_patch16, mae_base_patch16
+
+sys.path.append("unilm\\layoutlmv3")
 from layoutlmft.models.layoutlmv3 import LayoutLMv3Model
+# from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLMv3Model
 from transformers import AutoConfig
 
 __all__ = [
