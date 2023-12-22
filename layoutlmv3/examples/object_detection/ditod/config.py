@@ -34,6 +34,7 @@ def add_vit_config(cfg):
     _C.MODEL.IMAGE_ONLY = True
     _C.PUBLAYNET_DATA_DIR_TRAIN = ""
     _C.PUBLAYNET_DATA_DIR_TEST = ""
+    _C.SBERSLIDES_DATA_DIR = ""
     _C.ICDAR_DATA_DIR_TRAIN = ""
     _C.ICDAR_DATA_DIR_TEST = ""
     _C.CACHE_DIR = ""
