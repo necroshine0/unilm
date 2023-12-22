@@ -41,8 +41,10 @@ MODEL:
     POST_NMS_TOPK_TRAIN: 2000
     POST_NMS_TOPK_TEST: 1000
 DATASETS:
-  TRAIN: ("publaynet_train",)
-  TEST: ("publaynet_val",)
+  # TRAIN: ("publaynet_train",)
+  # TEST: ("publaynet_val",)
+  TRAIN: ("sberslides_train",)
+  TEST: ("sberslides_val",)
 SOLVER:
   GRADIENT_ACCUMULATION_STEPS: 1
   BASE_LR: 0.0002
@@ -80,4 +82,5 @@ SEED: 42
 OUTPUT_DIR: "/path/to/models/layoutlmv3/fts/publaynet-base/"
 PUBLAYNET_DATA_DIR_TRAIN: "/path/to/data/PubLayNet/publaynet/train"
 PUBLAYNET_DATA_DIR_TEST: "/path/to/data/PubLayNet/publaynet/val"
+SBERSLIDES_DATA_DIR: "data/sber-slides"
 CACHE_DIR: "/path/to/cache/huggingface"

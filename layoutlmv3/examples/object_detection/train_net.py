@@ -47,6 +47,7 @@ def setup(args):
     add_vit_config(cfg)
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
+    cfg.SBERSLIDES_DATA_DIR = 'data/sber-slides'
     cfg.freeze()
     default_setup(cfg, args)
     return cfg
@@ -55,36 +56,34 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    """
-    register publaynet first
-    """
+    # register_coco_instances(
+    #     "publaynet_train",
+    #     {},
+    #     cfg.PUBLAYNET_DATA_DIR_TRAIN + ".json",
+    #     cfg.PUBLAYNET_DATA_DIR_TRAIN
+    # )
+
+    # register_coco_instances(
+    #     "publaynet_val",
+    #     {},
+    #     cfg.PUBLAYNET_DATA_DIR_TEST + ".json",
+    #     cfg.PUBLAYNET_DATA_DIR_TEST
+    # )
+
     register_coco_instances(
-        "publaynet_train",
+        "sberslides_train",
         {},
-        cfg.PUBLAYNET_DATA_DIR_TRAIN + ".json",
-        cfg.PUBLAYNET_DATA_DIR_TRAIN
+        cfg.SBERSLIDES_DATA_DIR + '/train.json',
+        cfg.SBERSLIDES_DATA_DIR
     )
 
     register_coco_instances(
-        "publaynet_val",
+        "sberslides_val",
         {},
-        cfg.PUBLAYNET_DATA_DIR_TEST + ".json",
-        cfg.PUBLAYNET_DATA_DIR_TEST
+        cfg.SBERSLIDES_DATA_DIR + '/val.json',
+        cfg.SBERSLIDES_DATA_DIR
     )
 
-    register_coco_instances(
-        "icdar2019_train",
-        {},
-        cfg.ICDAR_DATA_DIR_TRAIN + ".json",
-        cfg.ICDAR_DATA_DIR_TRAIN
-    )
-
-    register_coco_instances(
-        "icdar2019_test",
-        {},
-        cfg.ICDAR_DATA_DIR_TEST + ".json",
-        cfg.ICDAR_DATA_DIR_TEST
-    )
 
     if args.eval_only:
         model = MyTrainer.build_model(cfg)
