@@ -1,8 +1,10 @@
-datasets==1.15.1
+datasets
 transformers
 seqeval==1.2.2
+tensorboard
+deepspeed
 sentencepiece
-timm==0.4.12
+timm
 Pillow
 einops
 textdistance

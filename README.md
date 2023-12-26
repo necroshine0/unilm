@@ -9,7 +9,7 @@ import os
 os.rename("layoutlmv3-base-finetuned-publaynet/model_final.pth", "layoutlmv3-base-finetuned-publaynet/pytorch_model.bin")
 
 !pip3 install -q -r unilm/layoutlmv3/requirements.txt
-!pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+!pip3 install -q torch torchvision --index-url https://download.pytorch.org/whl/cu118
 !pip3 install -q 'git+https://github.com/facebookresearch/detectron2.git'
 !pip3 check detectron2
 
@@ -21,4 +21,12 @@ When importing from the `unilm`, use:
 ```
 import sys
 sys.path.append("unilm\\layoutlmv3")
+
+try:
+    from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLM3Model
+    from unilm.layoutlmv3.examples.object_detection.ditod.config import add_vit_config
+except:
+    from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLM3Model
+    from unilm.layoutlmv3.examples.object_detection.ditod.config import add_vit_config
 ```
+or restart the kernel after lib installation

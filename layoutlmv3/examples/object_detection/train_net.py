@@ -37,6 +37,10 @@ from detectron2.engine.train_loop import AMPTrainer, SimpleTrainer
 from ditod import MyDetectionCheckpointer, ICDAREvaluator
 from ditod import MyTrainer
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 
 def setup(args):
     """
