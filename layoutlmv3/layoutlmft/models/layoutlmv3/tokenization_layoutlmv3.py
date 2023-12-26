@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tokenization classes for LayoutLMv3, refer to RoBERTa."""
+"""Tokenization classes for LayoutLM3, refer to RoBERTa."""
 
 from transformers.models.roberta import RobertaTokenizer
 from transformers.utils import logging
@@ -25,7 +25,7 @@ VOCAB_FILES_NAMES = {
     "merges_file": "merges.txt",
 }
 
-class LayoutLMv3Tokenizer(RobertaTokenizer):
+class LayoutLM3Tokenizer(RobertaTokenizer):
     vocab_files_names = VOCAB_FILES_NAMES
     # pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
     # max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES

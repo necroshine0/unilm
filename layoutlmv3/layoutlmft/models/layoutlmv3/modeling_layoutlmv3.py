@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""PyTorch LayoutLMv3 model. """
+"""PyTorch LayoutLM3 model. """
 import math
 
 import torch
@@ -40,7 +40,7 @@ from transformers.models.roberta.modeling_roberta import (
 )
 from transformers.utils import logging
 
-from .configuration_layoutlmv3 import LayoutLMv3Config
+from .configuration_layoutlmv3 import LayoutLM3Config
 from timm.models.layers import to_2tuple
 
 
@@ -74,7 +74,7 @@ class PatchEmbed(nn.Module):
         x = x.flatten(2).transpose(1, 2)
         return x
 
-class LayoutLMv3Embeddings(nn.Module):
+class LayoutLM3Embeddings(nn.Module):
     """
     Same as BertEmbeddings with a tiny tweak for positional embeddings indexing.
     """
@@ -203,13 +203,13 @@ class LayoutLMv3Embeddings(nn.Module):
         return position_ids.unsqueeze(0).expand(input_shape)
 
 
-class LayoutLMv3PreTrainedModel(PreTrainedModel):
+class LayoutLM3PreTrainedModel(PreTrainedModel):
     """
     An abstract class to handle weights initialization and a simple interface for downloading and loading pretrained
     models.
     """
 
-    config_class = LayoutLMv3Config
+    config_class = LayoutLM3Config
     base_model_prefix = "layoutlmv3"
 
     # Copied from transformers.models.bert.modeling_bert.BertPreTrainedModel._init_weights
@@ -230,7 +230,7 @@ class LayoutLMv3PreTrainedModel(PreTrainedModel):
             module.weight.data.fill_(1.0)
 
 
-class LayoutLMv3SelfAttention(nn.Module):
+class LayoutLM3SelfAttention(nn.Module):
     def __init__(self, config):
         super().__init__()
         if config.hidden_size % config.num_attention_heads != 0 and not hasattr(config, "embedding_size"):
@@ -354,10 +354,10 @@ class LayoutLMv3SelfAttention(nn.Module):
         return outputs
 
 
-class LayoutLMv3Attention(nn.Module):
+class LayoutLM3Attention(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.self = LayoutLMv3SelfAttention(config)
+        self.self = LayoutLM3SelfAttention(config)
         self.output = RobertaSelfOutput(config)
         self.pruned_heads = set()
 
@@ -407,12 +407,12 @@ class LayoutLMv3Attention(nn.Module):
         return outputs
 
 
-class LayoutLMv3Layer(nn.Module):
+class LayoutLM3Layer(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.chunk_size_feed_forward = config.chunk_size_feed_forward
         self.seq_len_dim = 1
-        self.attention = LayoutLMv3Attention(config)
+        self.attention = LayoutLM3Attention(config)
         assert not config.is_decoder and not config.add_cross_attention, \
             "This version do not support decoder. Please refer to RoBERTa for implementation of is_decoder."
         self.intermediate = RobertaIntermediate(config)
@@ -458,12 +458,12 @@ class LayoutLMv3Layer(nn.Module):
         return layer_output
 
 
-class LayoutLMv3Encoder(nn.Module):
+class LayoutLM3Encoder(nn.Module):
     def __init__(self, config, detection=False, out_features=None):
         super().__init__()
         self.config = config
         self.detection = detection
-        self.layer = nn.ModuleList([LayoutLMv3Layer(config) for _ in range(config.num_hidden_layers)])
+        self.layer = nn.ModuleList([LayoutLM3Layer(config) for _ in range(config.num_hidden_layers)])
         self.gradient_checkpointing = False
 
         self.has_relative_attention_bias = config.has_relative_attention_bias
@@ -696,7 +696,7 @@ class LayoutLMv3Encoder(nn.Module):
         )
 
 
-class LayoutLMv3Model(LayoutLMv3PreTrainedModel):
+class LayoutLM3Model(LayoutLM3PreTrainedModel):
     """
     """
 
@@ -716,8 +716,8 @@ class LayoutLMv3Model(LayoutLMv3PreTrainedModel):
             self.image_only = image_only
 
         if not self.image_only:
-            self.embeddings = LayoutLMv3Embeddings(config)
-        self.encoder = LayoutLMv3Encoder(config, detection=detection, out_features=out_features)
+            self.embeddings = LayoutLM3Embeddings(config)
+        self.encoder = LayoutLM3Encoder(config, detection=detection, out_features=out_features)
 
         if config.visual_embed:
             embed_dim = self.config.hidden_size
@@ -983,7 +983,7 @@ class LayoutLMv3Model(LayoutLMv3PreTrainedModel):
         )
 
 
-class LayoutLMv3ClassificationHead(nn.Module):
+class LayoutLM3ClassificationHead(nn.Module):
     """
     Head for sentence-level classification tasks.
     Reference: RobertaClassificationHead
@@ -1012,7 +1012,7 @@ class LayoutLMv3ClassificationHead(nn.Module):
         return x
 
 
-class LayoutLMv3ForTokenClassification(LayoutLMv3PreTrainedModel):
+class LayoutLM3ForTokenClassification(LayoutLM3PreTrainedModel):
     _keys_to_ignore_on_load_unexpected = [r"pooler"]
     _keys_to_ignore_on_load_missing = [r"position_ids"]
 
@@ -1020,12 +1020,12 @@ class LayoutLMv3ForTokenClassification(LayoutLMv3PreTrainedModel):
         super().__init__(config)
         self.num_labels = config.num_labels
 
-        self.layoutlmv3 = LayoutLMv3Model(config)
+        self.layoutlmv3 = LayoutLM3Model(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         if config.num_labels < 10:
             self.classifier = nn.Linear(config.hidden_size, config.num_labels)
         else:
-            self.classifier = LayoutLMv3ClassificationHead(config, pool_feature=False)
+            self.classifier = LayoutLM3ClassificationHead(config, pool_feature=False)
 
         self.init_weights()
 
@@ -1098,7 +1098,7 @@ class LayoutLMv3ForTokenClassification(LayoutLMv3PreTrainedModel):
         )
 
 
-class LayoutLMv3ForQuestionAnswering(LayoutLMv3PreTrainedModel):
+class LayoutLM3ForQuestionAnswering(LayoutLM3PreTrainedModel):
     _keys_to_ignore_on_load_unexpected = [r"pooler"]
     _keys_to_ignore_on_load_missing = [r"position_ids"]
 
@@ -1106,9 +1106,9 @@ class LayoutLMv3ForQuestionAnswering(LayoutLMv3PreTrainedModel):
         super().__init__(config)
         self.num_labels = config.num_labels
 
-        self.layoutlmv3 = LayoutLMv3Model(config)
+        self.layoutlmv3 = LayoutLM3Model(config)
         # self.qa_outputs = nn.Linear(config.hidden_size, config.num_labels)
-        self.qa_outputs = LayoutLMv3ClassificationHead(config, pool_feature=False)
+        self.qa_outputs = LayoutLM3ClassificationHead(config, pool_feature=False)
 
         self.init_weights()
 
@@ -1193,15 +1193,15 @@ class LayoutLMv3ForQuestionAnswering(LayoutLMv3PreTrainedModel):
         )
 
 
-class LayoutLMv3ForSequenceClassification(LayoutLMv3PreTrainedModel):
+class LayoutLM3ForSequenceClassification(LayoutLM3PreTrainedModel):
     _keys_to_ignore_on_load_missing = [r"position_ids"]
 
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
         self.config = config
-        self.layoutlmv3 = LayoutLMv3Model(config)
-        self.classifier = LayoutLMv3ClassificationHead(config, pool_feature=False)
+        self.layoutlmv3 = LayoutLM3Model(config)
+        self.classifier = LayoutLM3ClassificationHead(config, pool_feature=False)
 
         self.init_weights()
 

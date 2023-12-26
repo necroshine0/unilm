@@ -6,14 +6,14 @@ from transformers.utils import logging
 logger = logging.get_logger(__name__)
 
 LAYOUTLMV3_PRETRAINED_CONFIG_ARCHIVE_MAP = {
-    "layoutlmv3-base": "https://huggingface.co/microsoft/layoutlmv3-base/resolve/main/config.json",
-    "layoutlmv3-large": "https://huggingface.co/microsoft/layoutlmv3-large/resolve/main/config.json",
-    # See all LayoutLMv3 models at https://huggingface.co/models?filter=layoutlmv3
+    "layoutlm3-base": "https://huggingface.co/microsoft/layoutlmv3-base/resolve/main/config.json",
+    "layoutlm3-large": "https://huggingface.co/microsoft/layoutlmv3-large/resolve/main/config.json",
+    # See all LayoutLM3 models at https://huggingface.co/models?filter=layoutlmv3
 }
 
 
-class LayoutLMv3Config(BertConfig):
-    model_type = "layoutlmv3"
+class LayoutLM3Config(BertConfig):
+    model_type = "layoutlm3"
 
     def __init__(
         self,

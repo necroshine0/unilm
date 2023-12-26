@@ -635,7 +635,7 @@ class MyTrainer(TrainerBase):
             mapper = None
         return build_detection_test_loader(cfg, dataset_name, mapper=mapper)
         # Better to use mapper, which is the same as training.
-        # The mapper does not influence the DiT model, but it is necessary for the LayoutLMv3 model
+        # The mapper does not influence the DiT model, but it is necessary for the LayoutLM3 model
         # since we customize something in mapper.
         # return build_detection_test_loader(cfg, dataset_name)
 

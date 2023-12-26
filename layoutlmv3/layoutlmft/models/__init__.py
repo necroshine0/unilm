@@ -1,7 +1,7 @@
 from .layoutlmv3 import (
-    LayoutLMv3Config,
-    LayoutLMv3ForTokenClassification,
-    LayoutLMv3ForQuestionAnswering,
-    LayoutLMv3ForSequenceClassification,
-    LayoutLMv3Tokenizer,
+    LayoutLM3Config,
+    LayoutLM3ForTokenClassification,
+    LayoutLM3ForQuestionAnswering,
+    LayoutLM3ForSequenceClassification,
+    LayoutLM3Tokenizer,
 )

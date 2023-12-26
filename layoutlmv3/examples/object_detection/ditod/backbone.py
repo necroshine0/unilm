@@ -25,8 +25,8 @@ from .beit import beit_base_patch16, dit_base_patch16, dit_large_patch16, beit_l
 from .deit import deit_base_patch16, mae_base_patch16
 
 sys.path.append("unilm\\layoutlmv3")
-from layoutlmft.models.layoutlmv3 import LayoutLMv3Model
-# from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLMv3Model
+from layoutlmft.models.layoutlmv3 import LayoutLM3Model
+# from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLM3Model
 from transformers import AutoConfig
 
 __all__ = [
@@ -89,7 +89,7 @@ class VIT_Backbone(Backbone):
             # disable relative bias as DiT
             config.has_spatial_attention_bias = False
             config.has_relative_attention_bias = False
-            self.backbone = LayoutLMv3Model(config, detection=True,
+            self.backbone = LayoutLM3Model(config, detection=True,
                                                out_features=out_features, image_only=image_only)
         else:
             self.backbone = model_func(img_size=img_size,
