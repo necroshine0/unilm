@@ -3,7 +3,12 @@ Data structures used by the evaluation process.
 Yu Fang - March 2019
 """
 
-from collections import Iterable
+import sys
+
+if "3.9" in sys.version:
+    from collections import Iterable
+elif "3.10" in sys.version:
+    from collections.abc import Iterable
 
 import numpy as np
 from shapely.geometry import Polygon
