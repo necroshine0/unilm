@@ -32,6 +32,10 @@ def add_vit_config(cfg):
     _C.AUG.DETR = False
     _C.AUG.COLOR = False
 
+    _C.ADJUST_BOXES.USE = False
+    _C.ADJUST_BOXES.EPS = 20.0
+    _C.ADJUST_BOXES.GRID_RESOLUTION = 8.0
+
     _C.MODEL.IMAGE_ONLY = True
     _C.PUBLAYNET_DATA_DIR_TRAIN = ""
     _C.PUBLAYNET_DATA_DIR_TEST = ""

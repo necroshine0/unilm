@@ -79,6 +79,10 @@ VERSION: 2
 AUG:
   DETR: True
   COLOR: False
+ADJUST_BOXES:
+  USE: True
+  EPS: 20
+  GRID_RESOLUTION: 8.0
 SEED: 42
 OUTPUT_DIR: "/path/to/models/layoutlmv3/fts/publaynet-base/"
 PUBLAYNET_DATA_DIR_TRAIN: "/path/to/data/PubLayNet/publaynet/train"

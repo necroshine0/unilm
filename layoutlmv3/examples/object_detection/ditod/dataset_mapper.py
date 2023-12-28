@@ -51,6 +51,38 @@ def build_transform_gen(cfg, is_train, aug_flip_crop=True):
     return tfm_gens
 
 
+def snap_to_grid(box, grid_resolution):
+    x_min, y_min, x_max, y_max = box[:, 0], box[:, 1], box[:, 2], box[:, 3]
+    snapped_x_min = torch.round(x_min / grid_resolution) * grid_resolution
+    snapped_y_min = torch.round(y_min / grid_resolution) * grid_resolution
+    snapped_x_max = torch.round(x_max / grid_resolution) * grid_resolution
+    snapped_y_max = torch.round(y_max / grid_resolution) * grid_resolution
+    return torch.stack([snapped_x_min, snapped_y_min, snapped_x_max, snapped_y_max])
+
+
+def adjust_mesh(bboxes, labels, eps, grid_resolution):
+    xyxy_bboxes = bboxes.clone()
+    xyxy_bboxes[:, 2] += xyxy_bboxes[:, 0]
+    xyxy_bboxes[:, 3] += xyxy_bboxes[:, 1]
+
+    meshes_inds = torch.argwhere(labels == 8).flatten()
+    for ind in meshes_inds:
+        xyxy_mesh = xyxy_bboxes[ind].clone()
+
+        masks_labels = (labels == 9)
+        masks_min = torch.stack([ xyxy_bboxes[:, i] >= xyxy_mesh[i] - eps for i in range(2) ]).prod(dim=0)
+        masks_max = torch.stack([ xyxy_bboxes[:, i] <= xyxy_mesh[i] + eps for i in range(2, 4) ]).prod(dim=0)
+        cells_included_mask = (masks_labels * masks_max * masks_min > 0).flatten()
+        xyxy_cells = xyxy_bboxes[cells_included_mask]
+
+        min_x, min_y = xyxy_cells[:, 0].min().item(), xyxy_cells[:, 1].min().item()
+        max_x, max_y = xyxy_cells[:, 2].max().item(), xyxy_cells[:, 3].max().item()
+        xyxy_bboxes[ind] = torch.tensor([min_x, min_y, max_x, max_y])
+
+    new_bbox = snap_to_grid(xyxy_bboxes, grid_resolution).T
+    return new_bbox
+
+
 class DetrDatasetMapper:
     """
     A callable which takes a dataset dict in Detectron2 Dataset format,
@@ -86,6 +118,7 @@ class DetrDatasetMapper:
             self.crop_gen = None
 
         self.mask_on = cfg.MODEL.MASK_ON
+        self.adjust_boxes = cfg.ADJUST_BOXES.USE
         self.tfm_gens = build_transform_gen(cfg, is_train, aug_flip_crop)
         logging.getLogger(__name__).info(
             "Full TransformGens used in training: {}, crop: {}".format(str(self.tfm_gens), str(self.crop_gen))
@@ -100,6 +133,15 @@ class DetrDatasetMapper:
             dict: a format that builtin models in detectron2 accept
         """
         dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
+
+        if self.adjust_boxes:
+            annots = dataset_dict['annotations']
+            labels = torch.tensor([ann['category_id'] for ann in annots])
+            bboxes = torch.tensor([ann['bbox'] for ann in annots])
+            new_bboxes = adjust_mesh(bboxes, labels, cfg.ADJUST_BOXES.EPS, cfg.ADJUST_BOXES.GRID_RESOLUTION)
+            for i in range(len(annots)):
+                # В dataset_dict тоже меняется, ибо по ссылке
+                annots[i]['bbox'] = new_bboxes[i].tolist()
 
         image = utils.read_image(dataset_dict["file_name"], format=self.img_format)
         utils.check_image_size(dataset_dict, image)
