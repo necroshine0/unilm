@@ -22,8 +22,6 @@ def build_transform_gen(cfg, is_train, aug_flip_crop=True):
     Returns:
         list[TransformGen]
     """
-    self.layoutlmv3 = 'layoutlmv3' in cfg.MODEL.VIT.NAME
-
     if is_train:
         min_size = cfg.INPUT.MIN_SIZE_TRAIN
         max_size = cfg.INPUT.MAX_SIZE_TRAIN
@@ -74,6 +72,8 @@ def adjust_mesh(bboxes, labels, eps, grid_resolution):
         masks_max = torch.stack([ xyxy_bboxes[:, i] <= xyxy_mesh[i] + eps for i in range(2, 4) ]).prod(dim=0)
         cells_included_mask = (masks_labels * masks_max * masks_min > 0).flatten()
         xyxy_cells = xyxy_bboxes[cells_included_mask]
+        if len(xyxy_cells) == 0:
+            continue
 
         min_x, min_y = xyxy_cells[:, 0].min().item(), xyxy_cells[:, 1].min().item()
         max_x, max_y = xyxy_cells[:, 2].max().item(), xyxy_cells[:, 3].max().item()
@@ -119,6 +119,8 @@ class DetrDatasetMapper:
 
         self.mask_on = cfg.MODEL.MASK_ON
         self.adjust_boxes = cfg.ADJUST_BOXES.USE
+        self.eps = cfg.ADJUST_BOXES.EPS
+        self.grid_resolution = cfg.ADJUST_BOXES.GRID_RESOLUTION
         self.tfm_gens = build_transform_gen(cfg, is_train, aug_flip_crop)
         logging.getLogger(__name__).info(
             "Full TransformGens used in training: {}, crop: {}".format(str(self.tfm_gens), str(self.crop_gen))
@@ -138,7 +140,7 @@ class DetrDatasetMapper:
             annots = dataset_dict['annotations']
             labels = torch.tensor([ann['category_id'] for ann in annots])
             bboxes = torch.tensor([ann['bbox'] for ann in annots])
-            new_bboxes = adjust_mesh(bboxes, labels, cfg.ADJUST_BOXES.EPS, cfg.ADJUST_BOXES.GRID_RESOLUTION)
+            new_bboxes = adjust_mesh(bboxes, labels, self.eps, self.grid_resolution)
             for i in range(len(annots)):
                 # В dataset_dict тоже меняется, ибо по ссылке
                 annots[i]['bbox'] = new_bboxes[i].tolist()

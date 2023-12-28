@@ -28,12 +28,12 @@ def add_vit_config(cfg):
     _C.SOLVER.BACKBONE_MULTIPLIER = 1.0
 
     _C.AUG = CN()
-
     _C.AUG.DETR = False
     _C.AUG.COLOR = False
 
+    _C.ADJUST_BOXES = CN()
     _C.ADJUST_BOXES.USE = False
-    _C.ADJUST_BOXES.EPS = 20.0
+    _C.ADJUST_BOXES.EPS = 30.0
     _C.ADJUST_BOXES.GRID_RESOLUTION = 8.0
 
     _C.MODEL.IMAGE_ONLY = True

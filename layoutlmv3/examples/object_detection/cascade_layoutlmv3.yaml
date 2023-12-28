@@ -81,7 +81,7 @@ AUG:
   COLOR: False
 ADJUST_BOXES:
   USE: True
-  EPS: 20
+  EPS: 30.0
   GRID_RESOLUTION: 8.0
 SEED: 42
 OUTPUT_DIR: "/path/to/models/layoutlmv3/fts/publaynet-base/"
