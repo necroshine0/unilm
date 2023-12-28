@@ -22,6 +22,8 @@ def build_transform_gen(cfg, is_train, aug_flip_crop=True):
     Returns:
         list[TransformGen]
     """
+    self.layoutlmv3 = 'layoutlmv3' in cfg.MODEL.VIT.NAME
+
     if is_train:
         min_size = cfg.INPUT.MIN_SIZE_TRAIN
         max_size = cfg.INPUT.MAX_SIZE_TRAIN
@@ -38,6 +40,12 @@ def build_transform_gen(cfg, is_train, aug_flip_crop=True):
     if is_train and aug_flip_crop:
         tfm_gens.append(T.RandomFlip())
     tfm_gens.append(T.ResizeShortestEdge(min_size, max_size, sample_style))
+
+    if is_train and cfg.AUG.COLOR:
+        tfm_gens.append(T.RandomBrightness(0.9, 1.1))
+        tfm_gens.append(T.RandomSaturation(0.9, 1.1))
+        tfm_gens.append(T.RandomContrast(0.9, 1.1))
+
     if is_train:
         logger.info("TransformGens used in training: " + str(tfm_gens))
     return tfm_gens

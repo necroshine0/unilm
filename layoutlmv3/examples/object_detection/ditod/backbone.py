@@ -25,14 +25,8 @@ from .beit import beit_base_patch16, dit_base_patch16, dit_large_patch16, beit_l
 from .deit import deit_base_patch16, mae_base_patch16
 
 sys.path.append("unilm\\layoutlmv3")
-
-try:
-    # for from .ipynb imports
-    from layoutlmft.models.layoutlmv3 import LayoutLM3Model
-except:
-    # for CLI imports aka python train_net.py
-    from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLM3Model
-    
+from layoutlmft.models.layoutlmv3 import LayoutLM3Model
+# from unilm.layoutlmv3.layoutlmft.models.layoutlmv3 import LayoutLM3Model
 from transformers import AutoConfig
 
 __all__ = [

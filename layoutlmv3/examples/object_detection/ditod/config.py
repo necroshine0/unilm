@@ -30,6 +30,7 @@ def add_vit_config(cfg):
     _C.AUG = CN()
 
     _C.AUG.DETR = False
+    _C.AUG.COLOR = False
 
     _C.MODEL.IMAGE_ONLY = True
     _C.PUBLAYNET_DATA_DIR_TRAIN = ""
