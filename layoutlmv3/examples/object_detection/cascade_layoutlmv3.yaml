@@ -78,6 +78,7 @@ DATALOADER:
 VERSION: 2
 AUG:
   DETR: True
+  COLOR: False
 SEED: 42
 OUTPUT_DIR: "/path/to/models/layoutlmv3/fts/publaynet-base/"
 PUBLAYNET_DATA_DIR_TRAIN: "/path/to/data/PubLayNet/publaynet/train"
