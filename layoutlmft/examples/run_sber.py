@@ -4,13 +4,11 @@
 import logging
 import os
 import sys
-from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 from datasets import ClassLabel, load_dataset, load_metric
 
-import layoutlmft.data.datasets.funsd
+import layoutlmft.data.datasets.sber
 import transformers
 from layoutlmft.data import DataCollatorForKeyValueExtraction
 from layoutlmft.data.data_args import DataTrainingArguments
@@ -92,7 +90,7 @@ def main():
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
-    datasets = load_dataset(os.path.abspath(layoutlmft.data.datasets.funsd.__file__))
+    datasets = load_dataset(os.path.abspath(layoutlmft.data.datasets.sber.__file__))
 
     if training_args.do_train:
         column_names = datasets["train"].column_names
