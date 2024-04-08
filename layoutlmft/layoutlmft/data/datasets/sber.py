@@ -34,7 +34,7 @@ class Sber(datasets.GeneratorBasedBuilder):
         'type: list, flavour: bul_list',
         'type: list, flavour: enum_list',
         'type: pic',
-        'type: pic, flavour: icon'
+        'type: pic, flavour: icon',
         'type: plot',
         'type: subtitle',
         'type: table, flavour: mesh',
@@ -55,12 +55,7 @@ class Sber(datasets.GeneratorBasedBuilder):
                     "id": datasets.Value("string"),
                     "tokens": datasets.Sequence(datasets.Value("string")),
                     "bboxes": datasets.Sequence(datasets.Sequence(datasets.Value("int64"))),
-                    "ner_tags": datasets.Sequence(
-                        datasets.features.ClassLabel(
-                            # names=["O", "B-HEADER", "I-HEADER", "B-QUESTION", "I-QUESTION", "B-ANSWER", "I-ANSWER"]
-                            names=self.tags_names
-                        )
-                    ),
+                    "ner_tags": datasets.Sequence(datasets.features.ClassLabel( names=self.tags_names)),
                     "image": datasets.Array3D(shape=(3, 224, 224), dtype="uint8"),
                 }
             ),
@@ -71,39 +66,44 @@ class Sber(datasets.GeneratorBasedBuilder):
         """Returns SplitGenerators."""
         return [
             datasets.SplitGenerator(
-                name=datasets.Split.TRAIN, gen_kwargs={"filepath": f"data/sber/train_jsons/"}
+                name=datasets.Split.TRAIN, gen_kwargs={"filepath": "data/sber/train_jsons/"}
             ),
             datasets.SplitGenerator(
-                name=datasets.Split.TEST, gen_kwargs={"filepath": f"data/sber/test_jsons/"}
+                name=datasets.Split.TEST, gen_kwargs={"filepath": "data/sber/test_jsons/"}
             ),
         ]
 
-    def _generate_examples(self, ann_dir):
-        logger.info("⏳ Generating examples from = %s", ann_dir)
-        for guid, file in enumerate(sorted(os.listdir(ann_dir))):
+    def _generate_examples(self, filepath):
+        logger.info("⏳ Generating examples from = %s", filepath)
+        for guid, file in enumerate(sorted(os.listdir(filepath))):
             tokens, bboxes, ner_tags = [], [], []
 
-            file_path = os.path.join(ann_dir, file)
+            file_path = os.path.join(filepath, file)
             data = json.load(open(file_path, "r", encoding="utf8"))
-            image_path = os.path.join("data", "sber", data["image"])
+            image_path = os.path.join("data", "sber", data["meta"]["image"])
             image, size = load_image(image_path)
             for item in data["form"]:
                 words, label = item["words"], item["label"]
                 words = [w for w in words if w["text"].strip() != ""]
                 if len(words) == 0:
                     continue
-                if label == "other":
-                    for w in words:
-                        tokens.append(w["text"])
-                        ner_tags.append("O")
-                        bboxes.append(normalize_bbox(w["box"], size))
-                else:
-                    tokens.append(words[0]["text"])
-                    ner_tags.append("B-" + label.upper())
-                    bboxes.append(normalize_bbox(words[0]["box"], size))
-                    for w in words[1:]:
-                        tokens.append(w["text"])
-                        ner_tags.append("I-" + label.upper())
-                        bboxes.append(normalize_bbox(w["box"], size))
+                # if label == "other":
+                #     for w in words:
+                #         tokens.append(w["text"])
+                #         ner_tags.append("O")
+                #         bboxes.append(normalize_bbox(w["box"], size))
+                # else:
+                #     tokens.append(words[0]["text"])
+                #     ner_tags.append("B-" + label.upper())
+                #     bboxes.append(normalize_bbox(words[0]["box"], size))
+                #     for w in words[1:]:
+                #         tokens.append(w["text"])
+                #         ner_tags.append("I-" + label.upper())
+                #         bboxes.append(normalize_bbox(w["box"], size))
+
+                for w in words:
+                    tokens.append(w["text"])
+                    ner_tags.append(label)
+                    bboxes.append(normalize_bbox(w["box"], size))
 
             yield guid, {"id": str(guid), "tokens": tokens, "bboxes": bboxes, "ner_tags": ner_tags, "image": image}
