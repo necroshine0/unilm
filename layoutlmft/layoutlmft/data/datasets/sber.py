@@ -12,10 +12,10 @@ logger = datasets.logging.get_logger(__name__)
 
 
 class SberConfig(datasets.BuilderConfig):
-    """BuilderConfig for FUNSD"""
+    """BuilderConfig for Sber"""
 
     def __init__(self, **kwargs):
-        """BuilderConfig for FUNSD.
+        """BuilderConfig for Sber.
 
         Args:
           **kwargs: keyword arguments forwarded to super.
@@ -57,6 +57,7 @@ class Sber(datasets.GeneratorBasedBuilder):
                     "bboxes": datasets.Sequence(datasets.Sequence(datasets.Value("int64"))),
                     "ner_tags": datasets.Sequence(datasets.features.ClassLabel( names=self.tags_names)),
                     "image": datasets.Array3D(shape=(3, 224, 224), dtype="uint8"),
+                    "image_path": datasets.Value("string"),
                 }
             ),
             supervised_keys=None,
@@ -81,25 +82,12 @@ class Sber(datasets.GeneratorBasedBuilder):
             file_path = os.path.join(filepath, file)
             data = json.load(open(file_path, "r", encoding="utf8"))
             image_path = os.path.join("data", "sber", data["meta"]["image"])
-            image, size = load_image(image_path)
+            image, size = load_image(image_path)  # resize to 224x224
             for item in data["form"]:
                 words, label = item["words"], item["label"]
                 words = [w for w in words if w["text"].strip() != ""]
                 if len(words) == 0:
                     continue
-                # if label == "other":
-                #     for w in words:
-                #         tokens.append(w["text"])
-                #         ner_tags.append("O")
-                #         bboxes.append(normalize_bbox(w["box"], size))
-                # else:
-                #     tokens.append(words[0]["text"])
-                #     ner_tags.append("B-" + label.upper())
-                #     bboxes.append(normalize_bbox(words[0]["box"], size))
-                #     for w in words[1:]:
-                #         tokens.append(w["text"])
-                #         ner_tags.append("I-" + label.upper())
-                #         bboxes.append(normalize_bbox(w["box"], size))
 
                 for w in words:
                     tokens.append(w["text"])

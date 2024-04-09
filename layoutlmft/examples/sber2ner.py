@@ -57,12 +57,18 @@ def main():
             category_id = ann['category_id']
             category = categories[ann['category_id']]['name']
             x1, y1, w, h = ann['bbox']
+            x2, y2 = x1 + w, y1 + h
 
             # Filter invalid bounding boxes
-            if x1 + w > W or y1 + h > H:
+            if args.filter_annots and (x2 > W or y2 > H):
                 continue
+            elif not args.filter_annots:
+                x2 = min(x2, W - 1)
+                y2 = min(y2, H - 1)
+            else:
+                pass
 
-            box = [x1, y1, x1 + w, y1 + h]
+            box = [x1, y1, x2, y2]
             cord_like_ann = {
                 "label": category,
                 "label_id": category_id,
