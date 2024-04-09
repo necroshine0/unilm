@@ -106,4 +106,5 @@ class Sber(datasets.GeneratorBasedBuilder):
                     ner_tags.append(label)
                     bboxes.append(normalize_bbox(w["box"], size))
 
-            yield guid, {"id": str(guid), "tokens": tokens, "bboxes": bboxes, "ner_tags": ner_tags, "image": image}
+            yield guid, {"id": str(guid), "tokens": tokens, "bboxes": bboxes,
+                         "ner_tags": ner_tags, "image": image, "image_path": image_path}

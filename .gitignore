@@ -108,3 +108,4 @@ speechlm/dataset/LibriSpeech/fast_phone2unit/dict.phn.txt
 layoutlmft/data
 layoutlmft/pretrained
 .idea
+sber2ner.ipynb

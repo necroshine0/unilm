@@ -7,8 +7,8 @@
     <list default="true" id="f5d036f8-767c-41fb-ba37-460cf5319bec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/layoutlmft/examples/run_sber.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/examples/run_sber.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/layoutlmft/layoutlmft/models/model_args.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/layoutlmft/models/model_args.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/layoutlmft/layoutlmft/data/datasets/sber.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/layoutlmft/data/datasets/sber.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/layoutlmft/utils/sber2ner.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/examples/sber2ner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +49,11 @@
     &quot;git-widget-placeholder&quot;: &quot;layoutlm2-fix&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Oleg\Desktop\unilm\layoutlmft\examples" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

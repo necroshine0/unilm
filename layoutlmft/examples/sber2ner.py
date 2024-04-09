@@ -62,10 +62,11 @@ def main():
             if x1 + w > W or y1 + h > H:
                 continue
 
+            box = [x1, y1, x1 + w, y1 + h]
             cord_like_ann = {
                 "label": category,
                 "label_id": category_id,
-                "words": [{"box": ann['bbox'], "text": text}],
+                "words": [{"box": box, "text": text}],
             }
 
             form.append(cord_like_ann)
