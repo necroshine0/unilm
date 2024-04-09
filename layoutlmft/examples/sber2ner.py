@@ -65,6 +65,8 @@ def main():
             elif not args.filter_annots:
                 x2 = min(x2, W - 1)
                 y2 = min(y2, H - 1)
+                x1 = max(x1, 0)
+                y1 = max(y1, 0)
             else:
                 pass
 
