@@ -32,3 +32,9 @@ class ModelArguments:
             "with private models)."
         },
     )
+    use_xlm: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether use LayoutXML."
+        },
+    )

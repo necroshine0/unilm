@@ -24,9 +24,13 @@ from transformers import (
     set_seed,
 )
 
+from layoutlmft import (LayoutXLMConfig,
+                        LayoutXLMTokenizerFast,
+                        LayoutXLMForTokenClassification,
+)
 from layoutlmft import (LayoutLMv2Config,
-                        LayoutLMv2ForTokenClassification,
                         LayoutLMv2TokenizerFast,
+                        LayoutLMv2ForTokenClassification,
 )
 
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
@@ -51,6 +55,18 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    if model_args.use_xlm:
+        print("LayoutXLM is used!")
+        LayoutLMOptConfig = LayoutXLMConfig
+        LayoutLMOptTokenizerFast = LayoutXLMTokenizerFast
+        LayoutLMOptForTokenClassification = LayoutXLMForTokenClassification
+    else:
+        print("LayoutLMv2 is used!")
+        LayoutLMOptConfig = LayoutLMv2Config
+        LayoutLMOptTokenizerFast = LayoutLMv2TokenizerFast
+        LayoutLMOptForTokenClassification = LayoutLMv2ForTokenClassification
+
 
     # Detecting last checkpoint.
     last_checkpoint = None
@@ -129,7 +145,7 @@ def main():
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
-    config = LayoutLMv2Config.from_pretrained(
+    config = LayoutLMOptConfig.from_pretrained(
         model_args.config_name if model_args.config_name else model_args.model_name_or_path,
         num_labels=num_labels,
         finetuning_task=data_args.task_name,
@@ -137,20 +153,21 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    tokenizer = LayoutLMv2TokenizerFast.from_pretrained(
+    tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         use_fast=True,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    model = LayoutLMv2ForTokenClassification.from_pretrained(
+    model = LayoutLMOptForTokenClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
         config=config,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        # ignore_mismatched_sizes=True,
     )
 
     # Tokenizer check: this script requires a fast tokenizer.
