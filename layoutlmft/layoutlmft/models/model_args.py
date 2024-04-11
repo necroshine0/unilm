@@ -35,6 +35,6 @@ class ModelArguments:
     use_xlm: bool = field(
         default=False,
         metadata={
-            "help": "Whether use LayoutXML."
+            "help": "Whether use LayoutXLM."
         },
     )

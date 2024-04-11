@@ -15,9 +15,9 @@ from layoutlmft.data.data_args import DataTrainingArguments
 from layoutlmft.models.model_args import ModelArguments
 from layoutlmft.trainers import FunsdTrainer as Trainer
 from transformers import (
-    # AutoConfig,
-    # AutoModelForTokenClassification,
-    # AutoTokenizer,
+    AutoConfig,
+    AutoModelForTokenClassification,
+    AutoTokenizer,
     HfArgumentParser,
     PreTrainedTokenizerFast,
     TrainingArguments,
@@ -153,13 +153,27 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
-        model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
-        cache_dir=model_args.cache_dir,
-        use_fast=True,
-        revision=model_args.model_revision,
-        use_auth_token=True if model_args.use_auth_token else None,
-    )
+    try:  # mb to use tokenizer w/ fixed tokenizer_name?
+        print("Trying LayoutLM tokenizer...")
+        tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
+            model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+            use_fast=True,
+            revision=model_args.model_revision,
+            use_auth_token=True if model_args.use_auth_token else None,
+        )
+        print("LayoutLM tokenizer is used!")
+    except:
+        print("Failed using LayoutLM tokenizer!")
+        print("Trying AutoTokenizer tokenizer...")
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+            use_fast=True,
+            revision=model_args.model_revision,
+            use_auth_token=True if model_args.use_auth_token else None,
+        )
+        print(f"{tokenizer.__name__} is used!")
     model = LayoutLMOptForTokenClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -246,8 +260,9 @@ def main():
 
     if training_args.do_eval:
         if "validation" not in datasets:
-            raise ValueError("--do_eval requires a validation dataset")
-        eval_dataset = datasets["validation"]
+            eval_dataset = datasets["test"]
+        else:
+            eval_dataset = datasets["validation"]
         if data_args.max_val_samples is not None:
             eval_dataset = eval_dataset.select(range(data_args.max_val_samples))
         eval_dataset = eval_dataset.map(
