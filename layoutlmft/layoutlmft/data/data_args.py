@@ -74,6 +74,10 @@ class DataTrainingArguments:
         metadata={"help": "Whether to return all the entity levels during evaluation or just the overall ones."},
     )
 
+    use_image: bool = field(default=True)
+
+    use_text: bool = field(default=True)
+
 
 @dataclass
 class XFUNDataTrainingArguments(DataTrainingArguments):

@@ -7,6 +7,7 @@ import sys
 
 import numpy as np
 from datasets import ClassLabel, load_dataset, load_metric
+from sklearn.metrics import classification_report
 
 import layoutlmft.data.datasets.sber
 import transformers
@@ -173,7 +174,7 @@ def main():
             revision=model_args.model_revision,
             use_auth_token=True if model_args.use_auth_token else None,
         )
-        print(f"{tokenizer.__name__} is used!")
+        print(f"{tokenizer} is used!")
     model = LayoutLMOptForTokenClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -293,6 +294,8 @@ def main():
         pad_to_multiple_of=8 if training_args.fp16 else None,
         padding=padding,
         max_length=512,
+        use_image=data_args.use_image,
+        use_text=data_args.use_text,
     )
 
     # Metrics
@@ -311,6 +314,8 @@ def main():
             [label_list[l] for (p, l) in zip(prediction, label) if l != -100]
             for prediction, label in zip(predictions, labels)
         ]
+
+        print(classification_report(labels, predictions))
 
         results = metric.compute(predictions=true_predictions, references=true_labels)
         if data_args.return_entity_level_metrics:
