@@ -52,9 +52,14 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    # Жутчайший костыль
-    with open('data/sber/use_text.txt', 'w') as f:
-        f.write(str(data_args.use_text))
+    # Set seed before initializing model.
+    set_seed(training_args.seed)
+
+    datasets = load_dataset(os.path.abspath(layoutlmft.data.datasets.sber.__file__))
+    # Костыль
+    if not data_args.use_text:
+        for key in datasets:
+            datasets[key] = datasets[key].map(lambda x: {"tokens" : ["_"] * len(x)}, input_columns="tokens")
 
     print(f"\nUSING TEXT: {data_args.use_text}")
     print(f"USING IMAGE: {data_args.use_image}")
@@ -98,11 +103,6 @@ def main():
         transformers.utils.logging.enable_default_handler()
         transformers.utils.logging.enable_explicit_format()
     logger.info(f"Training/evaluation parameters {training_args}")
-
-    # Set seed before initializing model.
-    set_seed(training_args.seed)
-
-    datasets = load_dataset(os.path.abspath(layoutlmft.data.datasets.sber.__file__))
 
     if training_args.do_train:
         column_names = datasets["train"].column_names

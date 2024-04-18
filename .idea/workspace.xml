@@ -7,6 +7,7 @@
     <list default="true" id="f5d036f8-767c-41fb-ba37-460cf5319bec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/layoutlmft/examples/run_sber.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/examples/run_sber.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/layoutlmft/layoutlmft/data/datasets/sber.py" beforeDir="false" afterPath="$PROJECT_DIR$/layoutlmft/layoutlmft/data/datasets/sber.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
