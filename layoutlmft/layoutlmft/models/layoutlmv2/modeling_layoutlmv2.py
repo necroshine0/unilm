@@ -603,7 +603,7 @@ class VisualBackbone(nn.Module):
             config.image_feature_pool_shape.append(self.backbone.output_shape()[self.out_feature_key].channels)
         assert self.backbone.output_shape()[self.out_feature_key].channels == config.image_feature_pool_shape[2]
 
-    def forward(self, images):      
+    def forward(self, images):
         images_input = ((images if torch.is_tensor(images) else images.tensor) - self.pixel_mean) / self.pixel_std
         features = self.backbone(images_input)
         features = features[self.out_feature_key]
@@ -708,47 +708,13 @@ class LayoutLMv2Model(LayoutLMv2PreTrainedModel):
         visual_shape = list(input_shape)
         visual_shape[1] = self.config.image_feature_pool_shape[0] * self.config.image_feature_pool_shape[1]
         visual_shape = torch.Size(visual_shape)
+
         final_shape = list(input_shape)
         final_shape[1] += visual_shape[1]
         final_shape = torch.Size(final_shape)
 
-        visual_bbox_x = (
-            torch.arange(
-                0,
-                1000 * (self.config.image_feature_pool_shape[1] + 1),
-                1000,
-                device=device,
-                dtype=bbox.dtype,
-            )
-            // self.config.image_feature_pool_shape[1]
-        )
-        visual_bbox_y = (
-            torch.arange(
-                0,
-                1000 * (self.config.image_feature_pool_shape[0] + 1),
-                1000,
-                device=device,
-                dtype=bbox.dtype,
-            )
-            // self.config.image_feature_pool_shape[0]
-        )
-        visual_bbox = torch.stack(
-            [
-                visual_bbox_x[:-1].repeat(self.config.image_feature_pool_shape[0], 1),
-                visual_bbox_y[:-1].repeat(self.config.image_feature_pool_shape[1], 1).transpose(0, 1),
-                visual_bbox_x[1:].repeat(self.config.image_feature_pool_shape[0], 1),
-                visual_bbox_y[1:].repeat(self.config.image_feature_pool_shape[1], 1).transpose(0, 1),
-            ],
-            dim=-1,
-        ).view(-1, bbox.size(-1))
-        visual_bbox = visual_bbox.repeat(final_shape[0], 1, 1)
-        final_bbox = torch.cat([bbox, visual_bbox], dim=1)
-
         if attention_mask is None:
             attention_mask = torch.ones(input_shape, device=device)
-
-        visual_attention_mask = torch.ones(visual_shape, device=device)
-        final_attention_mask = torch.cat([attention_mask, visual_attention_mask], dim=1)
 
         if token_type_ids is None:
             token_type_ids = torch.zeros(input_shape, dtype=torch.long, device=device)
@@ -758,14 +724,6 @@ class LayoutLMv2Model(LayoutLMv2PreTrainedModel):
             position_ids = self.embeddings.position_ids[:, :seq_length]
             position_ids = position_ids.expand_as(input_ids)
 
-        visual_position_ids = torch.arange(0, visual_shape[1], dtype=torch.long, device=device).repeat(
-            input_shape[0], 1
-        )
-        final_position_ids = torch.cat([position_ids, visual_position_ids], dim=1)
-
-        if bbox is None:
-            bbox = torch.zeros(tuple(list(input_shape) + [4]), dtype=torch.long, device=device)
-
         text_layout_emb = self._calc_text_embeddings(
             input_ids=input_ids,
             bbox=bbox,
@@ -773,15 +731,60 @@ class LayoutLMv2Model(LayoutLMv2PreTrainedModel):
             position_ids=position_ids,
         )
 
-        visual_emb = self._calc_img_embeddings(
-            image=image,
-            bbox=visual_bbox,
-            position_ids=visual_position_ids,
-        )
-        final_emb = torch.cat([text_layout_emb, visual_emb], dim=1)
+        if image is None:
+            visual_bbox_x = (
+                torch.arange(
+                    0,
+                    1000 * (self.config.image_feature_pool_shape[1] + 1),
+                    1000,
+                    device=device,
+                    dtype=bbox.dtype,
+                )
+                // self.config.image_feature_pool_shape[1]
+            )
+            visual_bbox_y = (
+                torch.arange(
+                    0,
+                    1000 * (self.config.image_feature_pool_shape[0] + 1),
+                    1000,
+                    device=device,
+                    dtype=bbox.dtype,
+                )
+                // self.config.image_feature_pool_shape[0]
+            )
+            visual_bbox = torch.stack(
+                [
+                    visual_bbox_x[:-1].repeat(self.config.image_feature_pool_shape[0], 1),
+                    visual_bbox_y[:-1].repeat(self.config.image_feature_pool_shape[1], 1).transpose(0, 1),
+                    visual_bbox_x[1:].repeat(self.config.image_feature_pool_shape[0], 1),
+                    visual_bbox_y[1:].repeat(self.config.image_feature_pool_shape[1], 1).transpose(0, 1),
+                ],
+                dim=-1,
+            ).view(-1, bbox.size(-1))
+
+            visual_bbox = visual_bbox.repeat(final_shape[0], 1, 1)
+            visual_attention_mask = torch.ones(visual_shape, device=device)
+            visual_position_ids = torch.arange(0, visual_shape[1], dtype=torch.long, device=device).repeat(
+                input_shape[0], 1
+            )
+
+            visual_emb = self._calc_img_embeddings(
+                image=image,
+                bbox=visual_bbox,
+                position_ids=visual_position_ids,
+            )
+
+            final_bbox = torch.cat([bbox, visual_bbox], dim=1)
+            final_attention_mask = torch.cat([attention_mask, visual_attention_mask], dim=1)
+            final_position_ids = torch.cat([position_ids, visual_position_ids], dim=1)
+            final_emb = torch.cat([text_layout_emb, visual_emb], dim=1)
+        else:
+            final_bbox = bbox
+            final_attention_mask = attention_mask
+            final_position_ids = position_ids
+            final_emb = text_layout_emb
 
         extended_attention_mask = final_attention_mask.unsqueeze(1).unsqueeze(2)
-
         extended_attention_mask = extended_attention_mask.to(dtype=self.dtype)
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 

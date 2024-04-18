@@ -21,11 +21,8 @@ class SberConfig(datasets.BuilderConfig):
         """
         super(SberConfig, self).__init__(**kwargs)
 
-
 class Sber(datasets.GeneratorBasedBuilder):
-    BUILDER_CONFIGS = [
-        SberConfig(name="sber", version=datasets.Version("1.0.0"), description="Sber dataset"),
-    ]
+    config = SberConfig(name="sber", version=datasets.Version("1.0.0"), description="Sber dataset")
 
     tags_names = [
         'type: focus',
@@ -74,6 +71,9 @@ class Sber(datasets.GeneratorBasedBuilder):
         ]
 
     def _generate_examples(self, filepath):
+        with open("data/sber/use_text.txt", "r") as f:
+            use_text = (f.read() == True)
+
         logger.info("⏳ Generating examples from = %s", filepath)
         for guid, file in enumerate(sorted(os.listdir(filepath))):
             tokens, bboxes, ner_tags = [], [], []
@@ -89,7 +89,7 @@ class Sber(datasets.GeneratorBasedBuilder):
                     continue
 
                 for w in words:
-                    tokens.append(w["text"])
+                    tokens.append(w["text"] if use_text else "")
                     ner_tags.append(label)
                     bboxes.append(normalize_bbox(w["box"], size))
 

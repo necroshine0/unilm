@@ -52,6 +52,10 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    # Жутчайший костыль
+    with open('data/sber/use_text.txt', 'w') as f:
+        f.write(str(data_args.use_text))
+
     print("LayoutLMv2 is used!")
     LayoutLMOptConfig = LayoutLMv2Config
     LayoutLMOptTokenizerFast = LayoutLMv2TokenizerFast
