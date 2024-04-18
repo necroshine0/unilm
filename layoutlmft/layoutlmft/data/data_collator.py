@@ -43,8 +43,7 @@ class DataCollatorForKeyValueExtraction:
     pad_to_multiple_of: Optional[int] = None
     label_pad_token_id: int = -100
 
-    use_img: bool = True
-    use_text: bool = True
+    use_image: bool = True
 
     def __call__(self, features):
         label_name = "label" if "label" in features[0].keys() else "labels"
@@ -66,13 +65,10 @@ class DataCollatorForKeyValueExtraction:
             return_tensors="pt" if labels is None else None,
         )
 
-        if not self.use_text:
-            del batch["input_ids"]
-
         if labels is None:
             return batch
 
-        sequence_length = torch.tensor(batch["input_ids"]).shape[1]
+        sequence_length = torch.tensor(batch["token_type_ids"]).shape[1]
         padding_side = self.tokenizer.padding_side
         if padding_side == "right":
             batch["labels"] = [label + [self.label_pad_token_id] * (sequence_length - len(label)) for label in labels]
@@ -84,6 +80,7 @@ class DataCollatorForKeyValueExtraction:
                 batch["bbox"] = [[[0, 0, 0, 0]] * (sequence_length - len(bbox)) + bbox for bbox in batch["bbox"]]
 
         batch = {k: torch.tensor(v, dtype=torch.int64) if isinstance(v[0], list) else v for k, v in batch.items()}
-        if has_image_input and self.use_img:
+        if has_image_input and self.use_image:
             batch["image"] = image
+
         return batch

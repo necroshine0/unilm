@@ -4,7 +4,6 @@ import json
 import os
 
 import datasets
-
 from layoutlmft.data.utils import load_image, normalize_bbox
 
 

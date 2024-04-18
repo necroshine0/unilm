@@ -7,7 +7,6 @@ import sys
 
 import numpy as np
 from datasets import ClassLabel, load_dataset, load_metric
-from sklearn.metrics import classification_report
 
 import layoutlmft.data.datasets.sber
 import transformers
@@ -25,10 +24,6 @@ from transformers import (
     set_seed,
 )
 
-from layoutlmft import (LayoutXLMConfig,
-                        LayoutXLMTokenizerFast,
-                        LayoutXLMForTokenClassification,
-)
 from layoutlmft import (LayoutLMv2Config,
                         LayoutLMv2TokenizerFast,
                         LayoutLMv2ForTokenClassification,
@@ -57,16 +52,10 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    if model_args.use_xlm:
-        print("LayoutXLM is used!")
-        LayoutLMOptConfig = LayoutXLMConfig
-        LayoutLMOptTokenizerFast = LayoutXLMTokenizerFast
-        LayoutLMOptForTokenClassification = LayoutXLMForTokenClassification
-    else:
-        print("LayoutLMv2 is used!")
-        LayoutLMOptConfig = LayoutLMv2Config
-        LayoutLMOptTokenizerFast = LayoutLMv2TokenizerFast
-        LayoutLMOptForTokenClassification = LayoutLMv2ForTokenClassification
+    print("LayoutLMv2 is used!")
+    LayoutLMOptConfig = LayoutLMv2Config
+    LayoutLMOptTokenizerFast = LayoutLMv2TokenizerFast
+    LayoutLMOptForTokenClassification = LayoutLMv2ForTokenClassification
 
 
     # Detecting last checkpoint.
@@ -154,6 +143,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+
     try:  # mb to use tokenizer w/ fixed tokenizer_name?
         print("Trying LayoutLM tokenizer...")
         tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
@@ -175,6 +165,7 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
         )
         print(f"{tokenizer} is used!")
+
     model = LayoutLMOptForTokenClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -295,7 +286,6 @@ def main():
         padding=padding,
         max_length=512,
         use_image=data_args.use_image,
-        use_text=data_args.use_text,
     )
 
     # Metrics
@@ -314,8 +304,6 @@ def main():
             [label_list[l] for (p, l) in zip(prediction, label) if l != -100]
             for prediction, label in zip(predictions, labels)
         ]
-
-        print(classification_report(labels, predictions))
 
         results = metric.compute(predictions=true_predictions, references=true_labels)
         if data_args.return_entity_level_metrics:
