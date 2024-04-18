@@ -72,7 +72,7 @@ class Sber(datasets.GeneratorBasedBuilder):
 
     def _generate_examples(self, filepath):
         with open("data/sber/use_text.txt", "r") as f:
-            use_text = (f.read() == True)
+            use_text = (f.read() == "True")
 
         logger.info("⏳ Generating examples from = %s", filepath)
         for guid, file in enumerate(sorted(os.listdir(filepath))):

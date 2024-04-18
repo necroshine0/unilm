@@ -731,7 +731,7 @@ class LayoutLMv2Model(LayoutLMv2PreTrainedModel):
             position_ids=position_ids,
         )
 
-        if image is None:
+        if image is not None:
             visual_bbox_x = (
                 torch.arange(
                     0,
