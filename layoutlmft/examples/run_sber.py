@@ -56,11 +56,13 @@ def main():
     with open('data/sber/use_text.txt', 'w') as f:
         f.write(str(data_args.use_text))
 
-    print("LayoutLMv2 is used!")
+    print(f"\nUSING TEXT: {data_args.use_text}")
+    print(f"USING IMAGE: {data_args.use_image}")
+    print("USING LayoutLMv2 MODEL\n")
+
     LayoutLMOptConfig = LayoutLMv2Config
     LayoutLMOptTokenizerFast = LayoutLMv2TokenizerFast
     LayoutLMOptForTokenClassification = LayoutLMv2ForTokenClassification
-
 
     # Detecting last checkpoint.
     last_checkpoint = None
@@ -148,27 +150,13 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
 
-    try:  # mb to use tokenizer w/ fixed tokenizer_name?
-        print("Trying LayoutLM tokenizer...")
-        tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
-            model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
-            cache_dir=model_args.cache_dir,
-            use_fast=True,
-            revision=model_args.model_revision,
-            use_auth_token=True if model_args.use_auth_token else None,
-        )
-        print("LayoutLM tokenizer is used!")
-    except:
-        print("Failed using LayoutLM tokenizer!")
-        print("Trying AutoTokenizer tokenizer...")
-        tokenizer = AutoTokenizer.from_pretrained(
-            model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
-            cache_dir=model_args.cache_dir,
-            use_fast=True,
-            revision=model_args.model_revision,
-            use_auth_token=True if model_args.use_auth_token else None,
-        )
-        print(f"{tokenizer} is used!")
+    tokenizer = LayoutLMOptTokenizerFast.from_pretrained(
+        model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
+        cache_dir=model_args.cache_dir,
+        use_fast=True,
+        revision=model_args.model_revision,
+        use_auth_token=True if model_args.use_auth_token else None,
+    )
 
     model = LayoutLMOptForTokenClassification.from_pretrained(
         model_args.model_name_or_path,
