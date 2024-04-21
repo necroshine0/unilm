@@ -1,5 +1,5 @@
 MODEL:
-  MASK_ON: True
+  MASK_ON: False
   IMAGE_ONLY: True
   META_ARCHITECTURE: "VLGeneralizedRCNN"
   PIXEL_MEAN: [ 127.5, 127.5, 127.5 ]
@@ -16,7 +16,7 @@ MODEL:
   ROI_HEADS:
     NAME: CascadeROIHeads
     IN_FEATURES: [ "p2", "p3", "p4", "p5" ]
-    NUM_CLASSES: 14
+    NUM_CLASSES: 17
   ROI_BOX_HEAD:
     CLS_AGNOSTIC_BBOX_REG: True
     NAME: "FastRCNNConvFCHead"
@@ -80,7 +80,7 @@ AUG:
   DETR: True
   COLOR: False
 ADJUST_BOXES:
-  USE: True
+  USE: False
   EPS: 30.0
   GRID_RESOLUTION: 8.0
 SEED: 42
