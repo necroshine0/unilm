@@ -60,20 +60,6 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    # register_coco_instances(
-    #     "publaynet_train",
-    #     {},
-    #     cfg.PUBLAYNET_DATA_DIR_TRAIN + ".json",
-    #     cfg.PUBLAYNET_DATA_DIR_TRAIN
-    # )
-
-    # register_coco_instances(
-    #     "publaynet_val",
-    #     {},
-    #     cfg.PUBLAYNET_DATA_DIR_TEST + ".json",
-    #     cfg.PUBLAYNET_DATA_DIR_TEST
-    # )
-
     register_coco_instances(
         "sberslides_train",
         {},
@@ -87,7 +73,6 @@ def main(args):
         cfg.SBERSLIDES_DATA_DIR + '/val.json',
         cfg.SBERSLIDES_DATA_DIR
     )
-
 
     if args.eval_only:
         model = MyTrainer.build_model(cfg)
