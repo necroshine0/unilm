@@ -20,6 +20,12 @@ def main():
         default=False,
     )
 
+    parser.add_argument(
+        '--sep',
+        type=int,
+        default=None,
+    )
+
     args = parser.parse_args()
     sber_path = os.path.join(args.path_to_datasets, 'sber')
     if not os.path.exists(sber_path):
@@ -29,17 +35,19 @@ def main():
     os.makedirs(f"{sber_path}/train_jsons", exist_ok=True)
     os.makedirs(f"{sber_path}/test_jsons", exist_ok=True)
 
-    with open(f"{sber_path}/result_with_text.json", 'r') as f:
+    with open(f"{sber_path}/full_dataset.json", 'r') as f:
         sber = json.load(f)
 
     images = sber['images']
+    if args.sep is not None:
+        images = images[:args.sep] 
     categories = sber['categories']
     annotations = sber['annotations']
 
     # Build and save annotations in NER format
     for img in images:
         img_id = img['id']
-        img_file = img['file_name']
+        img_file = img['file_name'].replace("\\", "/").replace(".png", ".jpg")
         W, H = img['width'], img['height']
         # Group annotations by image
         img_annots = []
@@ -62,13 +70,6 @@ def main():
             # Filter invalid bounding boxes
             if args.filter_annots and (x2 > W or y2 > H):
                 continue
-            elif not args.filter_annots:
-                x2 = min(x2, W - 1)
-                y2 = min(y2, H - 1)
-                x1 = max(x1, 0)
-                y1 = max(y1, 0)
-            else:
-                pass
 
             box = [x1, y1, x2, y2]
             cord_like_ann = {
